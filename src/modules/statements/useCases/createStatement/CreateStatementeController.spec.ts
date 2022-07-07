@@ -98,4 +98,54 @@ describe("Create statement", () => {
 
 });
 
+it("Should be able to create an transfer statement", async () => {
+
+  let response = await request(app)
+  .post("/api/v1/users")
+  .send({
+    name: "Carlos Briggs",
+    email: "povnok@icha.bj",
+    password: "123456"
+  });
+  const recipient_id = response.body.id;
+  response = await request(app)
+  .post("/api/v1/users")
+  .send({
+    name: "Sender User",
+    email: "test@mail.com",
+    password: "123456"
+  });
+
+
+  response = await request(app)
+    .post("/api/v1/sessions")
+    .send({
+      email: "test@mail.com",
+      password: "123456"
+    });
+
+    const { token } = response.body;
+
+   response =  await request(app)
+    .post(`/api/v1/statements/deposit`)
+    .auth(token, { type: "bearer" })
+    .send({
+      amount:900,
+      description: "Transfer"
+    });
+
+
+  response = await request(app)
+  .post(`/api/v1/statements/transfer/${recipient_id}`)
+  .auth(token, { type: "bearer" })
+  .send({
+    amount:100,
+    description: "Transfer"
+  });
+
+  expect(response.status).toBe(201);
+  expect(response.body).toHaveProperty("id");
+
+});
+
 });

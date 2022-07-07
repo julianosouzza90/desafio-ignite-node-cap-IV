@@ -3,6 +3,7 @@ import { AppError } from "../../../../shared/errors/AppError";
 import { InMemoryUsersRepository } from "../../../users/repositories/in-memory/InMemoryUsersRepository";
 import { OperationType } from "../../entities/Statement";
 import { InMemoryStatementsRepository } from "../../repositories/in-memory/InMemoryStatementsRepository";
+import { CreateStatementError } from "./CreateStatementError";
 import { CreateStatementUseCase } from "./CreateStatementUseCase";
 
 let usersRepositoryInMemory: InMemoryUsersRepository;
@@ -39,7 +40,87 @@ describe("Create Statement", () => {
     expect(statement).toHaveProperty("id");
 
   });
+  it("Should be able to create  a transfer statement", async () => {
+    const password = await hash("123456", 8);
+    const recipient_user = await usersRepositoryInMemory.create({
+      name: "Carlos Briggs",
+      email: "lut@ato.pr",
+      password,
+    });
 
+    const sender_user = await usersRepositoryInMemory.create({
+      name: "Manuel Bennett",
+      email: "utuzez@lesi.cd",
+      password
+    });
+
+    await createStatementUseCase.execute({
+      user_id: sender_user.id as string,
+      type: OperationType.DEPOSIT,
+      amount: 1000,
+      description: "Deposit"
+    });
+
+    const transfer = await createStatementUseCase.execute({
+      amount: 100,
+      description: "transfer to recipient",
+      type: OperationType.TRANSFER,
+      user_id: sender_user.id as string,
+      sender_id: sender_user.id as string,
+      recipient_id: recipient_user.id as string
+    });
+
+    expect(transfer).toHaveProperty("id");
+    expect(transfer).toHaveProperty("recipient_id");
+
+  });
+  it("Should not be able to create a transfer if  recipient does not exists", async () => {
+
+    const user_sender = await usersRepositoryInMemory.create({
+      name: "user",
+      email: "test@mail.com",
+      password: "123456"
+    });
+
+   await expect(
+      createStatementUseCase.execute({
+      amount:200,
+      description: "Transfer",
+      type: OperationType.TRANSFER,
+      recipient_id: "RecipientInexistent",
+      sender_id: "RecipientInexistent",
+      user_id: user_sender.id as string
+    })
+   ).rejects.toEqual(new CreateStatementError.UserNotFound())
+
+
+
+  });
+  it("Should not be able to create a transfer it the balance is less than the amount", async () => {
+    const password = await hash("123456", 8);
+    const recipient_user = await usersRepositoryInMemory.create({
+      name: "Carlos Briggs",
+      email: "lut@ato.pr",
+      password,
+    });
+
+    const sender_user = await usersRepositoryInMemory.create({
+      name: "Manuel Bennett",
+      email: "utuzez@lesi.cd",
+      password
+    });
+
+      await expect(
+        createStatementUseCase.execute({
+          amount: 100,
+          description: "transfer to recipient",
+          type: OperationType.TRANSFER,
+          user_id: sender_user.id as string,
+          sender_id: sender_user.id as string,
+          recipient_id: recipient_user.id as string
+        })
+      ).rejects.toEqual(new CreateStatementError.InsufficientFunds());
+  });
 
   it("should not be able to create a withdrawal transaction if the balance is less than the requested amount", async () => {
 
@@ -62,4 +143,5 @@ describe("Create Statement", () => {
     }).rejects.toBeInstanceOf(AppError);
 
   });
+
 });

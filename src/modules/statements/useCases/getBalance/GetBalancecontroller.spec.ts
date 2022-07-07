@@ -44,10 +44,10 @@ describe("get balance", () => {
     response = await request(app)
     .get("/api/v1/statements/balance")
     .auth(token, {type: "bearer"});
-
     expect(response.body).toHaveProperty("balance");
 
   });
+
 
   it("should not be able to return a balance when user does not exists" , async () => {
 
