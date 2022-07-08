@@ -53,29 +53,30 @@ export class StatementsRepository implements IStatementsRepository {
     .orWhere("statement.recipient_id = :recipient_id", { recipient_id: user_id })
     .getMany()
 
-    const recipient_id = statement.map(({ recipient_id }) => recipient_id);
 
     const balance = statement.reduce((acc, operation) => {
       if (operation.type === 'deposit') {
-        return acc += operation.amount;
+        return acc += Number(operation.amount);
       }
-      if (operation.type === 'transfer' && recipient_id) {
-        return acc += operation.amount;
-      }
-      if(operation.type === 'transfer' && !recipient_id) {
-        return acc -= operation.amount;
+      if(operation.type === 'transfer') {
+        if(operation.recipient_id === user_id) {
+          return acc += Number(operation.amount);
+        }
+        return acc -= Number(operation.amount);
       }
       if(operation.type === 'withdraw') {
-        return acc -= operation.amount;
+        return acc -= Number(operation.amount);
       }
       return acc;
     }, 0)
+
     if (with_statement) {
       return {
         statement,
         balance
       }
     }
+
 
     return { balance }
   }
