@@ -1,9 +1,9 @@
 import request from "supertest";
-import { Connection } from "typeorm";
+import { Connection, DataSource } from "typeorm";
 import { app } from "../../../../app";
-import createConnection from "../../../../database/";
+import { createConnection } from "../../../../database/";
 
-let connection: Connection;
+let connection: DataSource;
 
 describe("show user profile", () => {
 
@@ -13,7 +13,7 @@ describe("show user profile", () => {
   });
   afterAll(async () => {
     await connection.dropDatabase();
-    await connection.close();
+    await connection.destroy();
   });
 
   it("should be able to list a user profile", async () => {

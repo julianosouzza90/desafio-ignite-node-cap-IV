@@ -1,8 +1,9 @@
 import request from "supertest";
-import { Connection } from "typeorm";
+import { DataSource } from "typeorm";
 import { app } from "../../../../app";
-import createConnection from "../../../../database";
-let connection: Connection;
+import { createConnection} from "../../../../database";
+
+let connection: DataSource;
 
 describe("Create user",  () => {
   beforeAll(async() => {
@@ -11,7 +12,7 @@ describe("Create user",  () => {
   });
   afterAll(async()=> {
     await connection.dropDatabase();
-    await connection.close();
+    await connection.destroy();
   });
   it("should be able to create a new user", async () => {
 

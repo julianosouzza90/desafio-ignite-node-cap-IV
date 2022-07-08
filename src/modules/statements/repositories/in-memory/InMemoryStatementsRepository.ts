@@ -17,11 +17,15 @@ export class InMemoryStatementsRepository implements IStatementsRepository {
     return statement;
   }
 
-  async findStatementOperation({ statement_id, user_id }: IGetStatementOperationDTO): Promise<Statement | undefined> {
-    return this.statements.find(operation => (
+  async findStatementOperation({ statement_id, user_id }: IGetStatementOperationDTO): Promise<Statement | null> {
+    const  statement = this.statements.find(operation => (
       operation.id === statement_id &&
       operation.user_id === user_id
     ));
+    if(!statement) {
+      return null;
+    }
+    return statement;
   }
 
   async getUserBalance({ user_id, with_statement = false }: IGetBalanceDTO):

@@ -1,25 +1,25 @@
 import request from "supertest";
-import { Connection } from "typeorm";
+import {  DataSource } from "typeorm";
 import { hash } from "bcryptjs";
 import { v4 as uuidv4 } from "uuid";
 
-import  getConnection  from "../../../../database";
+import  { createConnection}  from "../../../../database";
 import { app } from "../../../../app";
 
-let connection: Connection;
+let connection: DataSource;
 
 
 describe("user authenticate", () => {
 
   beforeAll(async () => {
-    connection = await getConnection();
+    connection = await createConnection();
     await connection.runMigrations();
 
   });
 
   afterAll(async() => {
     await connection.dropDatabase();
-    await connection.close();
+    await connection.destroy();
   })
 
   it("should be able to authenticate an user", async() => {

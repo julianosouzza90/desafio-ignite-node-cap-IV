@@ -1,18 +1,18 @@
 import  request from "supertest";
-import { Connection } from "typeorm";
+import {  DataSource } from "typeorm";
 import { app } from "../../../../app";
-import getConnection from "../../../../database";
+import { createConnection} from "../../../../database";
 
-let connection: Connection;
+let connection: DataSource;
 describe("get balance", () => {
 
   beforeAll(async () => {
-    connection = await getConnection();
+    connection = await createConnection();
     await connection.runMigrations();
   });
   afterAll(async () => {
     await connection.dropDatabase();
-    await connection.close();
+    await connection.destroy();
   })
   it("should be able to return a balance" , async () => {
     await request(app)

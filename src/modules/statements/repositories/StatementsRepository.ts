@@ -1,4 +1,5 @@
-import { getRepository, Repository } from "typeorm";
+import { Repository } from "typeorm";
+import appDataSource from "../../../database";
 
 import { Statement } from "../entities/Statement";
 import { ICreateStatementDTO } from "../useCases/createStatement/ICreateStatementDTO";
@@ -10,7 +11,7 @@ export class StatementsRepository implements IStatementsRepository {
   private repository: Repository<Statement>;
 
   constructor() {
-    this.repository = getRepository(Statement);
+    this.repository = appDataSource.getRepository(Statement);
   }
 
   async create({
@@ -33,9 +34,12 @@ export class StatementsRepository implements IStatementsRepository {
     return this.repository.save(statement);
   }
 
-  async findStatementOperation({ statement_id, user_id }: IGetStatementOperationDTO): Promise<Statement | undefined> {
-    return this.repository.findOne(statement_id, {
-      where: { user_id }
+  async findStatementOperation({ statement_id, user_id }: IGetStatementOperationDTO): Promise<Statement | null> {
+    return this.repository.findOne({
+      where: {
+        id: statement_id,
+        user_id,
+      }
     });
   }
 
@@ -44,18 +48,28 @@ export class StatementsRepository implements IStatementsRepository {
       { balance: number } | { balance: number, statement: Statement[] }
     >
   {
-    const statement = await this.repository.find({
-      where: { user_id }
-    });
+    const statement = await this.repository.createQueryBuilder("statement")
+    .where("statement.user_id = :user_id", { user_id })
+    .orWhere("statement.recipient_id = :recipient_id", { recipient_id: user_id })
+    .getMany()
+
+    const recipient_id = statement.map(({ recipient_id }) => recipient_id);
 
     const balance = statement.reduce((acc, operation) => {
       if (operation.type === 'deposit') {
-        return acc + operation.amount;
-      } else {
-        return acc - operation.amount;
+        return acc += operation.amount;
       }
+      if (operation.type === 'transfer' && recipient_id) {
+        return acc += operation.amount;
+      }
+      if(operation.type === 'transfer' && !recipient_id) {
+        return acc -= operation.amount;
+      }
+      if(operation.type === 'withdraw') {
+        return acc -= operation.amount;
+      }
+      return acc;
     }, 0)
-
     if (with_statement) {
       return {
         statement,

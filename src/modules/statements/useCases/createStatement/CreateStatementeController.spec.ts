@@ -1,17 +1,17 @@
 import request from "supertest";
 import { hash } from "bcryptjs";
-import { Connection } from "typeorm";
+import {  DataSource } from "typeorm";
 import { v4 as uuidv4 } from "uuid";
 
 import { app } from "../../../../app";
-import  getConnection from "../../../../database";
+import  { createConnection } from "../../../../database";
 
 
-let connection: Connection;
+let connection: DataSource;
 describe("Create statement", () => {
 
   beforeAll(async() => {
-    connection = await getConnection();
+    connection = await createConnection();
     await connection.runMigrations();
 
     const password =  await hash("123456", 8);
@@ -25,7 +25,7 @@ describe("Create statement", () => {
   });
   afterAll(async() => {
     await connection.dropDatabase();
-    await connection.close();
+    await connection.destroy();
   })
 
 
