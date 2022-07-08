@@ -1,15 +1,15 @@
 # desafio-ignite
 <div>
-  <p>Durante o treinamento nodejs da Rocketseat, são propostos desafios para fixação do conteúdo aprendido,
-  este repositório contém a implementação proposta em 3 desafios:  
+  <p>Durante o treinamento nodejs da Rocketseat, são propostos desafios para fixação do conteúdo aprendido.
+  Este repositório contém a implementação proposta em 3 desafios:  
   <ul>
     <li>Criação de testes unitários</li>
     <li>Testes de integração</li>
     <li>Implementação de nova funcionalidade</li>
   </ul>
   <p>
-  <p>Eu gostei bastante da última, pois me fez pensar bastante sobre maneiras de como fazer a implementação requerida, além de ter de analisar o código já feito, 
-  para modificá-los de modo que permitisse a nova implementação.
+  <p>Eu gostei bastante da última, pois me fez pensar bastante sobre maneiras de como fazer a implementação requerida, além de ter de analisar o código já feito
+  para modificá-lo de modo que permitisse a nova implementação.
   <a href="https://www.notion.so/Desafio-01-Transfer-ncias-com-a-Fin-API-5e1dbfc0bd66420f85f6a4948ad727c2">Veja o desafio proposto</a>
 </div>
 <div>
@@ -28,4 +28,9 @@
    Você pode mudar o arquivo  <a href="https://github.com/julianosouzza90/desafio-ignite-node-cap-IV/blob/main/src/database/index.ts">database/index.ts</a>
     para configurar a conexão com o banco de dados de acordo com suas credenciais do postgress
    </p>
+</div>
+<div>
+  <h2>Tecnologias</h2>
+<img align="center" alt="Javascript icon" height="30" width="40" src="https://raw.githubusercontent.com/devicons/devicon/master/icons/javascript/javascript-plain.svg">
+  <img align="center" alt="typescript icon" height="30" width="40" src="https://raw.githubusercontent.com/devicons/devicon/master/icons/typescript/typescript-plain.svg">
 </div>
